@@ -1,0 +1,172 @@
+
+class Rational{
+    int numerator = 1; // числитель
+    // защита от дурака: значение по умолчанию 1
+    int denominator = 1; // знаменатель
+    // защита от дурака: значение по умолчанию 1
+
+    String value = numerator + "/" + denominator;
+
+    // вспомогательные функции
+
+    void setnum(int q){    // задать числитель
+        this.numerator = q;
+    }
+
+    int getnum(){          // получить значение числителя
+        return numerator;
+    }
+    void setden(int n){    // задать знаменатель
+        if(n == 0){
+            System.out.println("Ошибка! Значение знаменателя не может быть 0");
+        }
+        else{
+            this.denominator = n;
+        }
+    }
+    int getden(){          // получить значение знаменателя
+        return denominator;
+    }
+    void newvalue(){
+        value = numerator + "/" + denominator;
+    }
+    String getvalue(){
+        return value;
+    }
+
+    void assign(Rational x){      // присваивание для дробей
+        setnum(x.getnum());
+        setden(x.getden());
+        newvalue();
+    }
+
+    int gcd(int a, int b){        // алгоритм евклида(поиск НОД чтобы на него сокращать дробь
+        if(a == b){
+            return a;
+        }
+        if(a == 0){
+            return b;
+        }
+        if(b == 0){
+            return a;
+        }
+        if(a == 1 || b == 1){
+            return 1;
+        }
+        if(a % 2 == 0 && b % 2 == 0){
+            return 2 * gcd(a / 2, b / 2);
+        }
+        else if(a % 2 == 0 && b % 2 == 1){
+            return gcd(a / 2, b);
+        }
+        else if(a % 2 == 1 && b % 2 == 0){
+            return gcd(a, b / 2);
+        }
+        else{
+            if(a > b){
+                return gcd((a - b)/2, b);
+            }
+            else{
+                return gcd((b - a)/2, a);
+            }
+        }
+    }
+
+    void normalize(){     // функция для приведения дроби в нормальный вид(сократить и вынести минус в числитель)
+        int sign = 1;
+        if(numerator < 0){
+            sign *= -1;
+            numerator *= -1;
+        }
+        if(denominator < 0){
+            sign *= -1;
+            denominator *= -1;
+        }
+        int reduct = gcd(numerator, denominator);
+        numerator /= reduct;
+        numerator *= sign;
+        denominator /= reduct;
+        newvalue();
+    }
+
+
+    // функции требуемые по заданию
+
+
+    void create(int num, int den){     // создание дроби
+        setnum(num);
+        if(den != 0) {
+            setden(den);
+        }
+        else{
+            System.out.println("Ошибка! Значение знаменателя не может равняться 0. Использовано значение по умолчанию");
+        }
+        normalize();
+        newvalue();
+    }
+
+    Rational sum(Rational x, Rational y){  // возвращает сумму дробей
+        Rational z = new Rational();
+        z.create(x.getnum()*y.getden() + x.getden()*y.getnum(), x.getden()*y.getden());
+        z.normalize();
+        return z;
+    }
+
+    Rational dif(Rational x, Rational y){  // возвращает разность дробей
+        Rational z = new Rational();
+        z.create(x.getnum()*y.getden() - x.getden()*y.getnum(), x.getden()*y.getden());
+        z.normalize();
+        return z;
+    }
+
+    Rational product(Rational x, Rational y){  // возвращает произведение дробей
+        Rational z = new Rational();
+        z.create(x.getnum()*y.getnum(), x.getden()*y.getden());
+        z.normalize();
+        return z;
+    }
+    Rational quotient(Rational x, Rational y){  // возвращает частное дробей
+        Rational z = new Rational();
+        z.create(x.getnum()*y.getden(), x.getden()*y.getnum());
+        z.normalize();
+        return z;
+    }
+
+
+    //    дополнителььные функции
+
+
+    int compar(Rational a, Rational b){      // возвращает 0 если a = b, 1 если a > b, -1 если a < b
+        if(dif(a,b).getnum() > 0){
+            return 1;
+        }
+        else if(dif(a,b).getnum() < 0){
+            return -1;
+        }
+        else{
+            return 0;
+        }
+    }
+}
+
+
+
+
+public class Main {
+    public static void main(String[] args){
+        Rational a = new Rational();
+        Rational b = new Rational();
+        Rational c = new Rational();
+        Rational d = new Rational();
+        Rational e = new Rational();
+        Rational ans = new Rational();
+        a.create(3,4);
+        b.create(-4,5);
+        c.create(8,11);
+        d.create(12, 11);
+        e.create(-21,60);
+        ans.assign(ans.dif(ans.sum(ans.product(a,b),ans.quotient(c,d)),e)); // =ab+c/d-e
+        System.out.println(ans.getvalue());
+        System.out.println(ans.compar(b,b));
+    }
+}
